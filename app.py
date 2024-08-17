@@ -3,29 +3,21 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from joblib import load
-import sys
 
 # Load the trained model and preprocessing pipeline
-try:
-    model = tf.keras.models.load_model('cybersecurity_model.h5')
-except Exception as e:
-    st.error(f"Error loading model: {e}")
-
+model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
 
-def generate_adversarial_examples(model, x, epsilon=0.1):
-    try:
-        x = tf.convert_to_tensor(x)
-        with tf.GradientTape() as tape:
-            tape.watch(x)
-            predictions = model(x, training=False)
-            loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
-        gradient = tape.gradient(loss, x)
-        adversarial_example = x + epsilon * tf.sign(gradient)
-        return adversarial_example
-    except Exception as e:
-        st.error(f"Error generating adversarial examples: {e}")
-        return None
+def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
+    x = tf.convert_to_tensor(x)
+    y_true = tf.convert_to_tensor(y_true)
+    with tf.GradientTape() as tape:
+        tape.watch(x)
+        predictions = model(x, training=False)
+        loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
+    gradient = tape.gradient(loss, x)
+    adversarial_example = x + epsilon * tf.sign(gradient)
+    return adversarial_example
 
 # Streamlit UI
 st.header('Cybersecurity Threat Prediction')
@@ -50,27 +42,24 @@ if st.button("Predict Threat"):
     )
 
     # Preprocess the input data
+    input_data_processed = preprocessor.transform(input_data)
+
+    # Assuming binary classification with a positive label
+    y_true = np.array([1])
+
     try:
-        input_data_processed = preprocessor.transform(input_data)
+        # Generate adversarial example
+        input_data_processed_adv = generate_adversarial_examples(model, input_data_processed, y_true)
+
+        # Make a prediction
+        prediction = model.predict(input_data_processed_adv)
+
+        # Display the result
+        if prediction[0] > 0.5:
+            st.markdown('### High Probability of Adversarial Attack')
+        else:
+            st.markdown('### Low Probability of Adversarial Attack')
+    except BrokenPipeError as e:
+        st.error("Error in prediction due to I/O issue: {}".format(e))
     except Exception as e:
-        st.error(f"Error during preprocessing: {e}")
-        input_data_processed = None
-
-    if input_data_processed is not None:
-        # Generate adversarial example (for testing purpose)
-        input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
-
-        if input_data_processed_adv is not None:
-            # Predict threat and handle long computation with a spinner
-            with st.spinner("Predicting..."):
-                try:
-                    prediction = model.predict(input_data_processed_adv)
-                    sys.stdout.flush()  # Manually flush the output buffer
-                except Exception as e:
-                    st.error(f"Prediction failed: {e}")
-
-            # Display the result
-            if prediction[0] > 0.5:
-                st.markdown('### High Probability of Adversarial Attack')
-            else:
-                st.markdown('### Low Probability of Adversarial Attack')
+        st.error(f"An unexpected error occurred: {e}")
