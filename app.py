@@ -11,6 +11,10 @@ preprocessor = load('preprocessing_pipeline.joblib')
 def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
     x = tf.convert_to_tensor(x)
     y_true = tf.convert_to_tensor(y_true)
+    
+    # Reshape y_true to match the shape of predictions
+    y_true = tf.reshape(y_true, (1, 1))
+
     with tf.GradientTape() as tape:
         tape.watch(x)
         predictions = model(x, training=False)
