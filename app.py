@@ -14,14 +14,18 @@ except Exception as e:
 preprocessor = load('preprocessing_pipeline.joblib')
 
 def generate_adversarial_examples(model, x, epsilon=0.1):
-    x = tf.convert_to_tensor(x)
-    with tf.GradientTape() as tape:
-        tape.watch(x)
-        predictions = model(x, training=False)
-        loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
-    gradient = tape.gradient(loss, x)
-    adversarial_example = x + epsilon * tf.sign(gradient)
-    return adversarial_example
+    try:
+        x = tf.convert_to_tensor(x)
+        with tf.GradientTape() as tape:
+            tape.watch(x)
+            predictions = model(x, training=False)
+            loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
+        gradient = tape.gradient(loss, x)
+        adversarial_example = x + epsilon * tf.sign(gradient)
+        return adversarial_example
+    except Exception as e:
+        st.error(f"Error generating adversarial examples: {e}")
+        return None
 
 # Streamlit UI
 st.header('Cybersecurity Threat Prediction')
@@ -46,21 +50,27 @@ if st.button("Predict Threat"):
     )
 
     # Preprocess the input data
-    input_data_processed = preprocessor.transform(input_data)
+    try:
+        input_data_processed = preprocessor.transform(input_data)
+    except Exception as e:
+        st.error(f"Error during preprocessing: {e}")
+        input_data_processed = None
 
-    # Generate adversarial example (for testing purpose)
-    input_data_processed_adv = generate_adversarial_examples(input_data_processed)
+    if input_data_processed is not None:
+        # Generate adversarial example (for testing purpose)
+        input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
 
-    # Predict threat and handle long computation with a spinner
-    with st.spinner("Predicting..."):
-        try:
-            prediction = model.predict(input_data_processed_adv)
-            sys.stdout.flush()  # Manually flush the output buffer
-        except Exception as e:
-            st.error(f"Prediction failed: {e}")
+        if input_data_processed_adv is not None:
+            # Predict threat and handle long computation with a spinner
+            with st.spinner("Predicting..."):
+                try:
+                    prediction = model.predict(input_data_processed_adv)
+                    sys.stdout.flush()  # Manually flush the output buffer
+                except Exception as e:
+                    st.error(f"Prediction failed: {e}")
 
-    # Display the result
-    if prediction[0] > 0.5:
-        st.markdown('### High Probability of Adversarial Attack')
-    else:
-        st.markdown('### Low Probability of Adversarial Attack')
+            # Display the result
+            if prediction[0] > 0.5:
+                st.markdown('### High Probability of Adversarial Attack')
+            else:
+                st.markdown('### Low Probability of Adversarial Attack')
