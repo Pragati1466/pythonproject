@@ -1,27 +1,14 @@
-import streamlit as st
+ import streamlit as st
 import pandas as pd
 import numpy as np
 import tensorflow as tf
 from joblib import load
+import sys
+import os
 
 # Load the trained model and preprocessing pipeline
 model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
-
-def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
-    x = tf.convert_to_tensor(x)
-    y_true = tf.convert_to_tensor(y_true)
-
-    # Ensure y_true is shaped correctly
-    y_true = tf.reshape(y_true, (x.shape[0], 1))  # Batch dimension should match x
-
-    with tf.GradientTape() as tape:
-        tape.watch(x)
-        predictions = model(x, training=False)
-        loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
-    gradient = tape.gradient(loss, x)
-    adversarial_example = x + epsilon * tf.sign(gradient)
-    return adversarial_example
 
 # Streamlit UI
 st.header('Cybersecurity Threat Prediction')
@@ -45,26 +32,34 @@ if st.button("Predict Threat"):
             columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
                      'Firmware_Version', 'Geofencing_Status']
         )
+        
+        # Ensure input data types are compatible with preprocessing pipeline
+        input_data = input_data.astype({
+            'Sensor_Data': 'float64',
+            'Vehicle_Speed': 'float64',
+            'Network_Traffic': 'float64',
+            'Sensor_Type': 'str',
+            'Sensor_Status': 'str',
+            'Vehicle_Model': 'str',
+            'Firmware_Version': 'str',
+            'Geofencing_Status': 'str'
+        })
 
         # Preprocess the input data
         input_data_processed = preprocessor.transform(input_data)
 
-        # Ensure input_data_processed has shape (1, 16) for the model
-        input_data_processed = np.reshape(input_data_processed, (1, -1))  # Reshape to (1, 16)
+        # Suppress stdout and stderr during prediction
+        with open(os.devnull, 'w') as devnull:
+            old_stdout = sys.stdout
+            old_stderr = sys.stderr
+            sys.stdout = devnull
+            sys.stderr = devnull
 
-        # Assuming binary classification with a positive label
-        y_true = np.array([1])
+            # Make a prediction
+            prediction = model.predict(input_data_processed)
 
-        # Generate adversarial example
-        input_data_processed_adv = generate_adversarial_examples(
-            model, input_data_processed, y_true
-        )
-
-        # Ensure the data is in batch format (reshape to (1, 16))
-        input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
-
-        # Make a prediction
-        prediction = model.predict(input_data_processed_adv)
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
 
         # Display the result
         if prediction[0] > 0.5:
@@ -73,4 +68,5 @@ if st.button("Predict Threat"):
             st.markdown('### Low Probability of Adversarial Attack')
 
     except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
+        st.write(f"An error occurred: {e}")
+        logging.error(f"Error during prediction: {e}")
