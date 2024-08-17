@@ -12,8 +12,8 @@ def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
     x = tf.convert_to_tensor(x)
     y_true = tf.convert_to_tensor(y_true)
 
-    # Reshape y_true to match the shape of predictions
-    y_true = tf.reshape(y_true, (1, 1))
+    # Ensure y_true is shaped correctly
+    y_true = tf.reshape(y_true, (x.shape[0], 1))  # Batch dimension should match x
 
     with tf.GradientTape() as tape:
         tape.watch(x)
@@ -49,17 +49,19 @@ if st.button("Predict Threat"):
     input_data_processed = preprocessor.transform(input_data)
 
     # Ensure input_data_processed has shape (1, 16) for the model
-    input_data_processed = np.expand_dims(input_data_processed, axis=0)
+    input_data_processed = np.reshape(input_data_processed, (1, -1))  # Reshape to (1, 16)
 
     # Assuming binary classification with a positive label
     y_true = np.array([1])
 
     try:
         # Generate adversarial example
-        input_data_processed_adv = generate_adversarial_examples(model, input_data_processed, y_true)
+        input_data_processed_adv = generate_adversarial_examples(
+            model, input_data_processed, y_true
+        )
 
-        # Ensure the data is in batch format (add batch dimension)
-        input_data_processed_adv = np.expand_dims(input_data_processed_adv, axis=0)
+        # Ensure the data is in batch format (reshape to (1, 16))
+        input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
 
         # Make a prediction
         prediction = model.predict(input_data_processed_adv)
