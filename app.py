@@ -55,6 +55,9 @@ if st.button("Predict Threat"):
         # Generate adversarial example
         input_data_processed_adv = generate_adversarial_examples(model, input_data_processed, y_true)
 
+        # Ensure the data is in batch format (add batch dimension)
+        input_data_processed_adv = np.expand_dims(input_data_processed_adv, axis=0)
+
         # Make a prediction
         prediction = model.predict(input_data_processed_adv)
 
