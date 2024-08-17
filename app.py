@@ -3,18 +3,21 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from joblib import load
+import sys
 
 # Load the trained model and preprocessing pipeline
-model = tf.keras.models.load_model('cybersecurity_model.h5')
+try:
+    model = tf.keras.models.load_model('cybersecurity_model.h5')
+except Exception as e:
+    st.error(f"Error loading model: {e}")
+
 preprocessor = load('preprocessing_pipeline.joblib')
 
 def generate_adversarial_examples(model, x, epsilon=0.1):
-    x = tf.convert_to_tensor(x, dtype=tf.float32)  # Ensure input is a tensor
+    x = tf.convert_to_tensor(x)
     with tf.GradientTape() as tape:
         tape.watch(x)
         predictions = model(x, training=False)
-        # Create a dummy label (e.g., all zeros) for loss calculation
-        y_true = tf.zeros_like(predictions)
         loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
     gradient = tape.gradient(loss, x)
     adversarial_example = x + epsilon * tf.sign(gradient)
@@ -45,14 +48,16 @@ if st.button("Predict Threat"):
     # Preprocess the input data
     input_data_processed = preprocessor.transform(input_data)
 
-    # Convert input_data_processed to a TensorFlow tensor
-    input_data_processed = tf.convert_to_tensor(input_data_processed, dtype=tf.float32)
-
     # Generate adversarial example (for testing purpose)
-    input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
+    input_data_processed_adv = generate_adversarial_examples(input_data_processed)
 
-    # Make a prediction
-    prediction = model.predict(input_data_processed_adv)
+    # Predict threat and handle long computation with a spinner
+    with st.spinner("Predicting..."):
+        try:
+            prediction = model.predict(input_data_processed_adv)
+            sys.stdout.flush()  # Manually flush the output buffer
+        except Exception as e:
+            st.error(f"Prediction failed: {e}")
 
     # Display the result
     if prediction[0] > 0.5:
