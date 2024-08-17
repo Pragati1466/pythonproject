@@ -8,23 +8,22 @@ from joblib import load
 model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
 
-# Function to generate adversarial examples
 def generate_adversarial_examples(model, x, epsilon=0.1):
-    x = tf.convert_to_tensor(x, dtype=tf.float32)
+    x = tf.convert_to_tensor(x, dtype=tf.float32)  # Ensure input is a tensor
     with tf.GradientTape() as tape:
         tape.watch(x)
         predictions = model(x, training=False)
-        y_true = tf.zeros_like(predictions)  # Dummy labels for loss calculation
+        # Create a dummy label (e.g., all zeros) for loss calculation
+        y_true = tf.zeros_like(predictions)
         loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
     gradient = tape.gradient(loss, x)
     adversarial_example = x + epsilon * tf.sign(gradient)
     return adversarial_example
 
 # Streamlit UI
-st.header('Cybersecurity Threat Prediction in Autonomous Vehicles')
+st.header('Cybersecurity Threat Prediction')
 
 # User inputs for the features
-vehicle_id = st.text_input('Vehicle ID')
 sensor_data = st.slider('Sensor Data', 0.0, 100.0)
 vehicle_speed = st.slider('Vehicle Speed (in km/h)', 0, 200)
 network_traffic = st.slider('Network Traffic (in MB)', 0.0, 1000.0)
@@ -35,29 +34,28 @@ firmware_version = st.selectbox('Firmware Version', ['v1.0', 'v2.0', 'v3.0'])
 geofencing_status = st.selectbox('Geofencing Status', ['Enabled', 'Disabled'])
 
 if st.button("Predict Threat"):
-    try:
-        # Create a DataFrame for the input
-        input_data = pd.DataFrame(
-            [[vehicle_id, sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version, geofencing_status]],
-            columns=['Vehicle_ID', 'Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model', 'Firmware_Version', 'Geofencing_Status']
-        )
+    # Create a DataFrame for the input
+    input_data = pd.DataFrame(
+        [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version,
+          geofencing_status]],
+        columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
+                 'Firmware_Version', 'Geofencing_Status']
+    )
 
-        # Preprocess the input data
-        input_data_processed = preprocessor.transform(input_data)
+    # Preprocess the input data
+    input_data_processed = preprocessor.transform(input_data)
 
-        # Convert input_data_processed to a TensorFlow tensor
-        input_data_processed = tf.convert_to_tensor(input_data_processed, dtype=tf.float32)
+    # Convert input_data_processed to a TensorFlow tensor
+    input_data_processed = tf.convert_to_tensor(input_data_processed, dtype=tf.float32)
 
-        # Generate adversarial example
-        input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
+    # Generate adversarial example (for testing purpose)
+    input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
 
-        # Make a prediction (ensure correct batch shape)
-        prediction = model.predict(input_data_processed_adv)
+    # Make a prediction
+    prediction = model.predict(input_data_processed_adv)
 
-        # Display the result
-        if prediction[0] > 0.5:
-            st.markdown('### High Probability of Adversarial Attack')
-        else:
-            st.markdown('### Low Probability of Adversarial Attack')
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
+    # Display the result
+    if prediction[0] > 0.5:
+        st.markdown('### High Probability of Adversarial Attack')
+    else:
+        st.markdown('### Low Probability of Adversarial Attack')
