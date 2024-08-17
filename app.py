@@ -35,29 +35,29 @@ firmware_version = st.selectbox('Firmware Version', ['v1.0', 'v2.0', 'v3.0'])
 geofencing_status = st.selectbox('Geofencing Status', ['Enabled', 'Disabled'])
 
 if st.button("Predict Threat"):
-    # Create a DataFrame for the input
-    input_data = pd.DataFrame(
-        [[vehicle_id, sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version, geofencing_status]],
-        columns=['Vehicle_ID', 'Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model', 'Firmware_Version', 'Geofencing_Status']
-    )
+    try:
+        # Create a DataFrame for the input
+        input_data = pd.DataFrame(
+            [[vehicle_id, sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version, geofencing_status]],
+            columns=['Vehicle_ID', 'Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model', 'Firmware_Version', 'Geofencing_Status']
+        )
 
-    # Preprocess the input data
-    input_data_processed = preprocessor.transform(input_data)
+        # Preprocess the input data
+        input_data_processed = preprocessor.transform(input_data)
 
-    # Convert input_data_processed to a TensorFlow tensor
-    input_data_processed = tf.convert_to_tensor(input_data_processed, dtype=tf.float32)
+        # Convert input_data_processed to a TensorFlow tensor
+        input_data_processed = tf.convert_to_tensor(input_data_processed, dtype=tf.float32)
 
-    # Generate adversarial example
-    input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
+        # Generate adversarial example
+        input_data_processed_adv = generate_adversarial_examples(model, input_data_processed)
 
-    # Make a prediction
-    prediction = model.predict(input_data_processed_adv)
+        # Make a prediction (ensure correct batch shape)
+        prediction = model.predict(input_data_processed_adv)
 
-    # Display the result
-    if prediction[0] > 0.5:
-        st.markdown('### High Probability of Adversarial Attack')
-    else:
-        st.markdown('### Low Probability of Adversarial Attack')
-
-# Footer
-st.write("Enhancing cybersecurity in autonomous vehicles through adversarial robustness")
+        # Display the result
+        if prediction[0] > 0.5:
+            st.markdown('### High Probability of Adversarial Attack')
+        else:
+            st.markdown('### Low Probability of Adversarial Attack')
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
