@@ -11,7 +11,7 @@ preprocessor = load('preprocessing_pipeline.joblib')
 def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
     x = tf.convert_to_tensor(x)
     y_true = tf.convert_to_tensor(y_true)
-    
+
     # Reshape y_true to match the shape of predictions
     y_true = tf.reshape(y_true, (1, 1))
 
@@ -49,8 +49,7 @@ if st.button("Predict Threat"):
     input_data_processed = preprocessor.transform(input_data)
 
     # Ensure input_data_processed has shape (1, 16) for the model
-    if input_data_processed.shape[0] == 1:
-        input_data_processed = np.squeeze(input_data_processed, axis=0)
+    input_data_processed = np.expand_dims(input_data_processed, axis=0)
 
     # Assuming binary classification with a positive label
     y_true = np.array([1])
