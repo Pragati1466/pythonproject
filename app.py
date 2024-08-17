@@ -48,6 +48,10 @@ if st.button("Predict Threat"):
     # Preprocess the input data
     input_data_processed = preprocessor.transform(input_data)
 
+    # Ensure input_data_processed has shape (1, 16) for the model
+    if input_data_processed.shape[0] == 1:
+        input_data_processed = np.squeeze(input_data_processed, axis=0)
+
     # Assuming binary classification with a positive label
     y_true = np.array([1])
 
@@ -66,7 +70,5 @@ if st.button("Predict Threat"):
             st.markdown('### High Probability of Adversarial Attack')
         else:
             st.markdown('### Low Probability of Adversarial Attack')
-    except BrokenPipeError as e:
-        st.error("Error in prediction due to I/O issue: {}".format(e))
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
