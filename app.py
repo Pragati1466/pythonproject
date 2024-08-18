@@ -40,8 +40,8 @@ model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
 
 def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
-    x = tf.convert_to_tensor(x)
-    y_true = tf.convert_to_tensor(y_true)
+    x = tf.convert_to_tensor(x, dtype=tf.float32)
+    y_true = tf.convert_to_tensor(y_true, dtype=tf.float32)
 
     y_true = tf.reshape(y_true, (x.shape[0], 1))
 
@@ -54,7 +54,6 @@ def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
     return adversarial_example
 
 def calculate_accuracy():
-    # Load your test dataset
     try:
         test_data = pd.read_csv('test_data.csv')
         X_test = test_data.drop(columns=['target'])
