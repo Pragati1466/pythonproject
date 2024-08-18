@@ -1,67 +1,98 @@
+import streamlit as st
 import pandas as pd
 import numpy as np
-from art.attacks.evasion import FastGradientMethod
-from art.classifiers import KerasClassifier
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+import tensorflow as tf
+from joblib import load
 
-# Load dataset
-csv_file_path = '/Users/apple/Library/Mobile Documents/com~apple~CloudDocs/cybersecurity_data_50_rows.csv'
-data = pd.read_csv(csv_file_path)
+# Importing the function from implementation.py
+from implementation import generate_adversarial_examples
 
-# Display the first few rows to understand the data structure
-print(data.head())
+# Custom CSS for background and text
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        background: url("https://images.unsplash.com/photo-1517142089942-ba376ce32a2d");
+        background-size: cover;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .sidebar .sidebar-content {
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffffff;
+    }
+    h1 {
+        color: #00ffcc;
+    }
+    .stSlider label, .stSelectbox label {
+        color: #ffffff;
+    }
+    .stButton button {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+    .stButton button:hover {
+        background-color: #0056b3;
+        color: #ffffff;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-# Feature columns and label column
-features = ['Sensor_Data', 'Attack_Type', 'Vehicle_Speed', 'Sensor_Type', 'Attack_Severity', 'Attack_Duration', 'Attack_Frequency']
-label = 'Response_Action'
+# Load the trained model and preprocessing pipeline
+model = tf.keras.models.load_model('cybersecurity_model.h5')
+preprocessor = load('preprocessing_pipeline.joblib')
 
-# Ensure the feature and label columns exist in the dataset
-if not all(col in data.columns for col in features + [label]):
-    raise ValueError("One or more feature or label columns are missing in the dataset.")
+# Streamlit UI
+st.header('Cybersecurity Threat Prediction')
 
-# Preprocess data
-X = data[features]
-y = data[label]
+# User inputs for the features
+sensor_data = st.slider('Sensor Data', 0.0, 100.0)
+vehicle_speed = st.slider('Vehicle Speed (in km/h)', 0, 200)
+network_traffic = st.slider('Network Traffic (in MB)', 0.0, 1000.0)
+sensor_type = st.selectbox('Sensor Type', ['Type 1', 'Type 2', 'Type 3'])
+sensor_status = st.selectbox('Sensor Status', ['Active', 'Inactive', 'Error'])
+vehicle_model = st.selectbox('Vehicle Model', ['Model A', 'Model B', 'Model C'])
+firmware_version = st.selectbox('Firmware Version', ['v1.0', 'v2.0', 'v3.0'])
+geofencing_status = st.selectbox('Geofencing Status', ['Enabled', 'Disabled'])
 
-# Convert categorical features to numeric if necessary
-X = pd.get_dummies(X)
+if st.button("Predict Threat"):
+    try:
+        # Create a DataFrame for the input
+        input_data = pd.DataFrame(
+            [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version,
+              geofencing_status]],
+            columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
+                     'Firmware_Version', 'Geofencing_Status']
+        )
 
-# Normalize features
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+        # Preprocess the input data
+        input_data_processed = preprocessor.transform(input_data)
 
-# Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+        # Ensure input_data_processed has shape (1, 16) for the model
+        input_data_processed = np.reshape(input_data_processed, (1, -1))  # Reshape to (1, 16)
 
-# Build and compile the TensorFlow model
-model = Sequential([
-    Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
-    Dense(32, activation='relu'),
-    Dense(1, activation='sigmoid')
-])
+        # Assuming binary classification with a positive label
+        y_true = np.array([1])
 
-model.compile(optimizer='adam',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
+        # Generate adversarial example using the imported function
+        input_data_processed_adv = generate_adversarial_examples(
+            model, input_data_processed, y_true
+        )
 
-# Train the model
-history = model.fit(X_train, y_train, epochs=10, validation_split=0.2)
+        # Ensure the data is in batch format (reshape to (1, 16))
+        input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
 
-# Save the model
-model.save('cybersecurity_model.h5')  # Save the model to use in app.py
+        # Make a prediction
+        prediction = model.predict(input_data_processed_adv)
 
-# Wrap your TensorFlow model with ART
-classifier = KerasClassifier(model=model)
+        # Display the result
+        if prediction[0] > 0.5:
+            st.markdown('### High Probability of Adversarial Attack')
+        else:
+            st.markdown('### Low Probability of Adversarial Attack')
 
-# Define attack
-attack = FastGradientMethod(classifier, eps=0.1)
-
-# Generate adversarial examples
-X_test_adv = attack.generate(X_test)
-
-# Test the model on adversarial examples
-accuracy = model.evaluate(X_test_adv, y_test)
-print(f'Accuracy on adversarial examples: {accuracy[1]*100:.2f}%')
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
