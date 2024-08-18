@@ -39,40 +39,41 @@ firmware_version = st.selectbox('Firmware Version', ['v1.0', 'v2.0', 'v3.0'])
 geofencing_status = st.selectbox('Geofencing Status', ['Enabled', 'Disabled'])
 
 if st.button("Predict Threat"):
-    try:
-        # Create a DataFrame for the input
-        input_data = pd.DataFrame(
-            [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version,
-              geofencing_status]],
-            columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
-                     'Firmware_Version', 'Geofencing_Status']
-        )
+    with st.spinner('Generating adversarial example and predicting...'):
+        try:
+            # Create a DataFrame for the input
+            input_data = pd.DataFrame(
+                [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version,
+                  geofencing_status]],
+                columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
+                         'Firmware_Version', 'Geofencing_Status']
+            )
 
-        # Preprocess the input data
-        input_data_processed = preprocessor.transform(input_data)
+            # Preprocess the input data
+            input_data_processed = preprocessor.transform(input_data)
 
-        # Ensure input_data_processed has shape (1, 16) for the model
-        input_data_processed = np.reshape(input_data_processed, (1, -1))  # Reshape to (1, 16)
+            # Ensure input_data_processed has shape (1, 16) for the model
+            input_data_processed = np.reshape(input_data_processed, (1, -1))  # Reshape to (1, 16)
 
-        # Assuming binary classification with a positive label
-        y_true = np.array([1])
+            # Assuming binary classification with a positive label
+            y_true = np.array([1])
 
-        # Generate adversarial example
-        input_data_processed_adv = generate_adversarial_examples(
-            model, input_data_processed, y_true
-        )
+            # Generate adversarial example
+            input_data_processed_adv = generate_adversarial_examples(
+                model, input_data_processed, y_true
+            )
 
-        # Ensure the data is in batch format (reshape to (1, 16))
-        input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
+            # Ensure the data is in batch format (reshape to (1, 16))
+            input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
 
-        # Make a prediction
-        prediction = model.predict(input_data_processed_adv)
+            # Make a prediction
+            prediction = model.predict(input_data_processed_adv)
 
-        # Display the result
-        if prediction[0] > 0.5:
-            st.markdown('### High Probability of Adversarial Attack')
-        else:
-            st.markdown('### Low Probability of Adversarial Attack')
+            # Display the result
+            if prediction[0] > 0.5:
+                st.markdown('### High Probability of Adversarial Attack')
+            else:
+                st.markdown('### Low Probability of Adversarial Attack')
 
-    except Exception as e:
-        st.error(f"An unexpected error occurred during prediction: {e}")
+        except Exception as e:
+            st.error(f"An unexpected error occurred during prediction: {e}")
