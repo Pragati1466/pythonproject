@@ -1,72 +1,57 @@
- import streamlit as st
+import streamlit as st
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-from joblib import load
-import sys
-import os
+from art.attacks.evasion import FastGradientMethod
+from art.classifiers import KerasClassifier
+from tensorflow.keras.models import load_model
+from sklearn.preprocessing import StandardScaler
 
-# Load the trained model and preprocessing pipeline
-model = tf.keras.models.load_model('cybersecurity_model.h5')
-preprocessor = load('preprocessing_pipeline.joblib')
+# Load your model
+model = load_model('cybersecurity_model.h5')
 
-# Streamlit UI
-st.header('Cybersecurity Threat Prediction')
+# Load your dataset
+csv_file_path = '/Users/apple/Library/Mobile Documents/com~apple~CloudDocs/cybersecurity_data_50_rows.csv'
+data = pd.read_csv(csv_file_path)
 
-# User inputs for the features
-sensor_data = st.slider('Sensor Data', 0.0, 100.0)
-vehicle_speed = st.slider('Vehicle Speed (in km/h)', 0, 200)
-network_traffic = st.slider('Network Traffic (in MB)', 0.0, 1000.0)
-sensor_type = st.selectbox('Sensor Type', ['Type 1', 'Type 2', 'Type 3'])
-sensor_status = st.selectbox('Sensor Status', ['Active', 'Inactive', 'Error'])
-vehicle_model = st.selectbox('Vehicle Model', ['Model A', 'Model B', 'Model C'])
-firmware_version = st.selectbox('Firmware Version', ['v1.0', 'v2.0', 'v3.0'])
-geofencing_status = st.selectbox('Geofencing Status', ['Enabled', 'Disabled'])
+# Define features
+features = ['Sensor_Data', 'Attack_Type', 'Vehicle_Speed', 'Sensor_Type', 'Attack_Severity', 'Attack_Duration', 'Attack_Frequency']
+label = 'Response_Action'
 
-if st.button("Predict Threat"):
-    try:
-        # Create a DataFrame for the input
-        input_data = pd.DataFrame(
-            [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version,
-              geofencing_status]],
-            columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
-                     'Firmware_Version', 'Geofencing_Status']
-        )
-        
-        # Ensure input data types are compatible with preprocessing pipeline
-        input_data = input_data.astype({
-            'Sensor_Data': 'float64',
-            'Vehicle_Speed': 'float64',
-            'Network_Traffic': 'float64',
-            'Sensor_Type': 'str',
-            'Sensor_Status': 'str',
-            'Vehicle_Model': 'str',
-            'Firmware_Version': 'str',
-            'Geofencing_Status': 'str'
-        })
+# Preprocess the data
+X = data[features]
+y = data[label]
 
-        # Preprocess the input data
-        input_data_processed = preprocessor.transform(input_data)
+# Convert categorical features to numeric if necessary
+X = pd.get_dummies(X)
 
-        # Suppress stdout and stderr during prediction
-        with open(os.devnull, 'w') as devnull:
-            old_stdout = sys.stdout
-            old_stderr = sys.stderr
-            sys.stdout = devnull
-            sys.stderr = devnull
+# Normalize features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-            # Make a prediction
-            prediction = model.predict(input_data_processed)
+# Use Streamlit for interaction
+st.title("Cybersecurity in Autonomous Vehicles")
+st.write("Enhancing Cybersecurity through Adversarial Robustness")
 
-            sys.stdout = old_stdout
-            sys.stderr = old_stderr
+# User input for new data points
+input_data = []
+for feature in features:
+    value = st.text_input(f'Enter {feature}', '0')
+    input_data.append(float(value))
 
-        # Display the result
-        if prediction[0] > 0.5:
-            st.markdown('### High Probability of Adversarial Attack')
-        else:
-            st.markdown('### Low Probability of Adversarial Attack')
+# Convert to numpy array and reshape for model input
+input_data = np.array(input_data).reshape(1, -1)
 
-    except Exception as e:
-        st.write(f"An error occurred: {e}")
-        logging.error(f"Error during prediction: {e}")
+# Normalize the input
+input_data_scaled = scaler.transform(input_data)
+
+# Predict using the model
+prediction = model.predict(input_data_scaled)
+st.write(f'Predicted Response Action: {prediction[0]}')
+
+# Generate adversarial example
+if st.button('Generate Adversarial Example'):
+    classifier = KerasClassifier(model=model)
+    attack = FastGradientMethod(classifier, eps=0.1)
+    adversarial_example = attack.generate(input_data_scaled)
+    adversarial_prediction = model.predict(adversarial_example)
+    st.write(f'Adversarial Example Prediction: {adversarial_prediction[0]}')
