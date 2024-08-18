@@ -3,75 +3,26 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from joblib import load
-from sklearn.metrics import accuracy_score
-
-# Custom CSS for background and text
-st.markdown(
-    """
-    <style>
-    .reportview-container {
-        background: url("https://your-image-url.com/background.jpg");
-        background-size: cover;
-    }
-    .sidebar .sidebar-content {
-        background: rgba(0, 0, 0, 0.7);
-    }
-    h1 {
-        color: #ffffff;
-    }
-    .stSlider label, .stSelectbox label {
-        color: #ffffff;
-    }
-    .stButton button {
-        background-color: #f0ad4e;
-        color: #ffffff;
-    }
-    .stButton button:hover {
-        background-color: #ec971f;
-        color: #ffffff;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # Load the trained model and preprocessing pipeline
 model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
 
 def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
-    x = tf.convert_to_tensor(x, dtype=tf.float32)
-    y_true = tf.convert_to_tensor(y_true, dtype=tf.float32)
-
-    y_true = tf.reshape(y_true, (x.shape[0], 1))
-
+    x = tf.convert_to_tensor(x)
+    y_true = tf.convert_to_tensor(y_true)
+    
+    # Ensure y_true is shaped correctly
+    y_true = tf.reshape(y_true, (x.shape[0], 1))  # Batch dimension should match x
+    
     with tf.GradientTape() as tape:
         tape.watch(x)
         predictions = model(x, training=False)
         loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
-    gradient = tape.gradient(loss, x)
-    adversarial_example = x + epsilon * tf.sign(gradient)
+        gradient = tape.gradient(loss, x)
+        adversarial_example = x + epsilon * tf.sign(gradient)
+        
     return adversarial_example
-
-def calculate_accuracy():
-    try:
-        test_data = pd.read_csv('test_data.csv')
-        X_test = test_data.drop(columns=['target'])
-        y_test = test_data['target']
-
-        # Preprocess the test data
-        X_test_processed = preprocessor.transform(X_test)
-
-        # Predict on test data
-        y_pred = model.predict(X_test_processed)
-        y_pred_classes = (y_pred > 0.5).astype(int)  # Convert probabilities to class labels
-
-        # Calculate accuracy
-        accuracy = accuracy_score(y_test, y_pred_classes)
-        return accuracy
-    except Exception as e:
-        st.error(f"An error occurred while calculating accuracy: {e}")
-        return None
 
 # Streamlit UI
 st.header('Cybersecurity Threat Prediction')
@@ -88,34 +39,35 @@ geofencing_status = st.selectbox('Geofencing Status', ['Enabled', 'Disabled'])
 
 if st.button("Predict Threat"):
     try:
+        # Create a DataFrame for the input
         input_data = pd.DataFrame(
-            [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version,
-              geofencing_status]],
-            columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model',
-                     'Firmware_Version', 'Geofencing_Status']
+            [[sensor_data, vehicle_speed, network_traffic, sensor_type, sensor_status, vehicle_model, firmware_version, geofencing_status]],
+            columns=['Sensor_Data', 'Vehicle_Speed', 'Network_Traffic', 'Sensor_Type', 'Sensor_Status', 'Vehicle_Model', 'Firmware_Version', 'Geofencing_Status']
         )
-
+        
+        # Preprocess the input data
         input_data_processed = preprocessor.transform(input_data)
-        input_data_processed = np.reshape(input_data_processed, (1, -1))
-
+        
+        # Ensure input_data_processed has shape (1, 16) for the model
+        input_data_processed = np.reshape(input_data_processed, (1, -1))  # Reshape to (1, 16)
+        
+        # Assuming binary classification with a positive label
         y_true = np.array([1])
+        
+        # Generate adversarial example
         input_data_processed_adv = generate_adversarial_examples(model, input_data_processed, y_true)
+        
+        # Ensure the data is in batch format (reshape to (1, 16))
         input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
-
+        
+        # Make a prediction
         prediction = model.predict(input_data_processed_adv)
-
+        
+        # Display the result
         if prediction[0] > 0.5:
             st.markdown('### High Probability of Adversarial Attack')
         else:
             st.markdown('### Low Probability of Adversarial Attack')
-
+    
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
-
-if st.button("Calculate Accuracy"):
-    try:
-        accuracy = calculate_accuracy()
-        if accuracy is not None:
-            st.markdown(f'### Model Accuracy: {accuracy:.2f}')
-    except Exception as e:
-        st.error(f"An unexpected error occurred while calculating accuracy: {e}")
