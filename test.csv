@@ -1,0 +1,51 @@
+Vehicle_ID	Sensor_Data	Adversarial_Attack	Attack_Type	Timestamp	Vehicle_Speed	Location	Sensor_Type	Sensor_Status	Attack_Severity	Response_Action	Attack_Duration	Attack_Frequency	Vehicle_Model	Firmware_Version	Network_Traffic	Error_Code	Geofencing_Status
+1	23.5	0	None	15/08/24 10:00	55 km/h	48.1234, 11.5678	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	120 MB/s	None	Inside
+2	45.2	1	Denial of Service	15/08/24 10:15	60 km/h	48.2345, 11.6789	Radar	Operational	High	Alert	5 minutes	1 attack/day	Model Y	v1.3	150 MB/s	404	Outside
+3	34.1	0	None	15/08/24 10:30	50 km/h	48.3456, 11.7890	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	110 MB/s	None	Inside
+4	56.7	1	Data Injection	15/08/24 10:45	70 km/h	48.4567, 11.8901	LIDAR	Operational	Medium	Shutdown	3 minutes	2 attacks/day	Model X	v1.1	140 MB/s	500	Inside
+5	22.9	0	None	15/08/24 11:00	45 km/h	48.5678, 11.9012	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	130 MB/s	None	Inside
+6	43.2	1	Malware	15/08/24 11:15	55 km/h	48.6789, 11.0123	Camera	Faulty	High	Alert	7 minutes	1 attack/day	Model Z	v1.3	160 MB/s	403	Outside
+7	37.8	0	None	15/08/24 11:30	50 km/h	48.7890, 11.1234	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	120 MB/s	None	Inside
+8	52.3	1	Phishing	15/08/24 11:45	60 km/h	48.8901, 11.2345	Radar	Operational	Medium	Alert	6 minutes	1 attack/day	Model Y	v1.2	150 MB/s	500	Inside
+9	30	0	None	15/08/24 12:00	45 km/h	48.9012, 11.3456	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.3	110 MB/s	None	Inside
+10	48.5	1	Man-in-the-Middle	15/08/24 12:15	70 km/h	49.0123, 11.4567	LIDAR	Operational	High	Shutdown	4 minutes	2 attacks/day	Model X	v1.1	140 MB/s	401	Outside
+11	26.8	1	SQL Injection	15/08/24 12:30	50 km/h	49.1234, 11.5678	Radar	Operational	Medium	Alert	5 minutes	1 attack/day	Model Y	v1.2	130 MB/s	500	Inside
+12	41.4	0	None	15/08/24 12:45	55 km/h	49.2345, 11.6789	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	120 MB/s	None	Inside
+13	33.7	1	Buffer Overflow	15/08/24 13:00	60 km/h	49.3456, 11.7890	LIDAR	Operational	High	Alert	8 minutes	2 attacks/day	Model X	v1.3	160 MB/s	402	Outside
+14	55	0	None	15/08/24 13:15	45 km/h	49.4567, 11.8901	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	130 MB/s	None	Inside
+15	28.1	1	Social Engineering	15/08/24 13:30	55 km/h	49.5678, 11.9012	Camera	Faulty	Medium	Shutdown	6 minutes	1 attack/day	Model Z	v1.3	140 MB/s	403	Outside
+16	49.6	0	None	15/08/24 13:45	60 km/h	49.6789, 11.0123	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	120 MB/s	None	Inside
+17	38.3	1	Cross-Site Scripting	15/08/24 14:00	70 km/h	49.7890, 11.1234	Radar	Operational	High	Alert	7 minutes	2 attacks/day	Model Y	v1.1	150 MB/s	500	Outside
+18	53.8	0	None	15/08/24 14:15	45 km/h	49.8901, 11.2345	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	130 MB/s	None	Inside
+19	29.2	1	Replay Attack	15/08/24 14:30	50 km/h	49.9012, 11.3456	LIDAR	Operational	Medium	Shutdown	5 minutes	1 attack/day	Model X	v1.3	140 MB/s	404	Inside
+20	47.5	0	None	15/08/24 14:45	60 km/h	50.0123, 11.4567	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	120 MB/s	None	Inside
+21	31.7	1	Session Hijacking	15/08/24 15:00	70 km/h	50.1234, 11.5678	Camera	Operational	High	Alert	6 minutes	2 attacks/day	Model Z	v1.3	160 MB/s	401	Outside
+22	50.4	0	None	15/08/24 15:15	55 km/h	50.2345, 11.6789	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	130 MB/s	None	Inside
+23	27.9	1	Privilege Escalation	15/08/24 15:30	60 km/h	50.3456, 11.7890	Radar	Faulty	Medium	Shutdown	7 minutes	1 attack/day	Model Y	v1.3	150 MB/s	500	Outside
+24	44.6	0	None	15/08/24 15:45	45 km/h	50.4567, 11.8901	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	110 MB/s	None	Inside
+25	36.1	1	Credential Stuffing	15/08/24 16:00	55 km/h	50.5678, 11.9012	LIDAR	Operational	High	Alert	8 minutes	2 attacks/day	Model X	v1.1	140 MB/s	402	Inside
+26	54.2	0	None	15/08/24 16:15	70 km/h	50.6789, 11.0123	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	130 MB/s	None	Outside
+27	32.8	1	Zero-Day Exploit	15/08/24 16:30	60 km/h	50.7890, 11.1234	Camera	Operational	High	Shutdown	6 minutes	1 attack/day	Model Z	v1.3	150 MB/s	403	Inside
+28	46.3	0	None	15/08/24 16:45	55 km/h	50.8901, 11.2345	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	120 MB/s	None	Inside
+29	39	1	Command Injection	15/08/24 17:00	70 km/h	50.9012, 11.3456	Radar	Operational	Medium	Alert	5 minutes	2 attacks/day	Model Y	v1.1	140 MB/s	404	Outside
+30	51.2	0	None	15/08/24 17:15	45 km/h	51.0123, 11.4567	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	130 MB/s	None	Inside
+31	24.7	1	URL Spoofing	15/08/24 17:30	60 km/h	51.1234, 11.5678	LIDAR	Operational	Medium	Alert	6 minutes	1 attack/day	Model X	v1.1	150 MB/s	402	Outside
+32	42.5	0	None	15/08/24 17:45	70 km/h	51.2345, 11.6789	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	120 MB/s	None	Inside
+33	30.6	1	Denial of Service	15/08/24 18:00	55 km/h	51.3456, 11.7890	Camera	Faulty	High	Shutdown	8 minutes	1 attack/day	Model Z	v1.3	160 MB/s	403	Outside
+34	49.1	0	None	15/08/24 18:15	45 km/h	51.4567, 11.8901	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	110 MB/s	None	Inside
+35	28.4	1	Man-in-the-Middle	15/08/24 18:30	60 km/h	51.5678, 11.9012	Radar	Operational	High	Alert	7 minutes	2 attacks/day	Model Y	v1.1	140 MB/s	401	Inside
+36	45.8	0	None	15/08/24 18:45	55 km/h	51.6789, 11.0123	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	120 MB/s	None	Inside
+37	35.2	1	Phishing	15/08/24 19:00	70 km/h	51.7890, 11.1234	LIDAR	Operational	Medium	Shutdown	6 minutes	1 attack/day	Model X	v1.3	150 MB/s	404	Outside
+38	52.6	0	None	15/08/24 19:15	60 km/h	51.8901, 11.2345	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	130 MB/s	None	Inside
+39	31	1	SQL Injection	15/08/24 19:30	50 km/h	51.9012, 11.3456	Camera	Operational	High	Alert	7 minutes	2 attacks/day	Model Z	v1.3	160 MB/s	402	Outside
+40	50.1	0	None	15/08/24 19:45	45 km/h	52.0123, 11.4567	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	120 MB/s	None	Inside
+41	27.5	1	Malware	15/08/24 20:00	60 km/h	52.1234, 11.5678	Radar	Faulty	High	Shutdown	5 minutes	1 attack/day	Model Y	v1.3	140 MB/s	500	Outside
+42	44.9	0	None	15/08/24 20:15	55 km/h	52.2345, 11.6789	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	130 MB/s	None	Inside
+43	29.8	1	Data Injection	15/08/24 20:30	70 km/h	52.3456, 11.7890	LIDAR	Operational	Medium	Alert	6 minutes	1 attack/day	Model X	v1.1	150 MB/s	401	Inside
+44	51.7	0	None	15/08/24 20:45	60 km/h	52.4567, 11.8901	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	120 MB/s	None	Outside
+45	38.9	1	Social Engineering	15/08/24 21:00	55 km/h	52.5678, 11.9012	Camera	Faulty	Medium	Shutdown	7 minutes	1 attack/day	Model Z	v1.3	140 MB/s	403	Inside
+46	46.2	0	None	15/08/24 21:15	45 km/h	52.6789, 11.0123	LIDAR	Operational	N/A	N/A	N/A	N/A	Model X	v1.2	130 MB/s	None	Inside
+47	33	1	Buffer Overflow	15/08/24 21:30	70 km/h	52.7890, 11.1234	Radar	Operational	High	Alert	8 minutes	2 attacks/day	Model Y	v1.1	150 MB/s	404	Outside
+48	49.5	0	None	15/08/24 21:45	60 km/h	52.8901, 11.2345	Camera	Operational	N/A	N/A	N/A	N/A	Model Z	v1.2	120 MB/s	None	Inside
+49	26.3	1	Credential Stuffing	15/08/24 22:00	55 km/h	52.9012, 11.3456	LIDAR	Faulty	Medium	Alert	6 minutes	1 attack/day	Model X	v1.3	140 MB/s	500	Outside
+50	43.6	0	None	15/08/24 22:15	45 km/h	53.0123, 11.4567	Radar	Operational	N/A	N/A	N/A	N/A	Model Y	v1.2	130 MB/s	None	Inside
