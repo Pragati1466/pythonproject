@@ -5,8 +5,11 @@ import tensorflow as tf
 from joblib import load
 
 # Load the trained model and preprocessing pipeline
-model = tf.keras.models.load_model('cybersecurity_model.h5')
-preprocessor = load('preprocessing_pipeline.joblib')
+try:
+    model = tf.keras.models.load_model('cybersecurity_model.h5')
+    preprocessor = load('preprocessing_pipeline.joblib')
+except Exception as e:
+    st.error(f"Error loading model or preprocessor: {e}")
 
 def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
     x = tf.convert_to_tensor(x)
@@ -59,7 +62,7 @@ if st.button("Predict Threat"):
             model, input_data_processed, y_true
         )
 
-     # Ensure the data is in batch format (reshape to (1, 16))
+        # Ensure the data is in batch format (reshape to (1, 16))
         input_data_processed_adv = np.reshape(input_data_processed_adv, (1, -1))
 
         # Make a prediction
@@ -72,5 +75,4 @@ if st.button("Predict Threat"):
             st.markdown('### Low Probability of Adversarial Attack')
 
     except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
-
+        st.error(f"An unexpected error occurred during prediction: {e}")
