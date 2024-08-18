@@ -4,6 +4,41 @@ import numpy as np
 import tensorflow as tf
 from joblib import load
 
+# Custom CSS for background and text
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        background: url("https://images.unsplash.com/photo-1517142089942-ba376ce32a2d");
+        background-size: cover;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .sidebar .sidebar-content {
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffffff;
+    }
+    h1 {
+        color: #00ffcc;
+    }
+    .stSlider label, .stSelectbox label {
+        color: #ffffff;
+    }
+    .stButton button {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+    .stButton button:hover {
+        background-color: #0056b3;
+        color: #ffffff;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # Load the trained model and preprocessing pipeline
 model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
