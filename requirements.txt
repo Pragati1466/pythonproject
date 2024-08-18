@@ -4,4 +4,4 @@ pandas
 numpy
 joblib
 scikit-learn
-adversarial-robustness-toolbox
+adversarial-robustness-toolbox==1.18.1
