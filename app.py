@@ -4,6 +4,9 @@ import numpy as np
 import tensorflow as tf
 from joblib import load
 
+# Importing the function from implementation.py
+from implementation import generate_adversarial_examples
+
 # Custom CSS for background and text
 st.markdown(
     """
@@ -38,25 +41,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # Load the trained model and preprocessing pipeline
 model = tf.keras.models.load_model('cybersecurity_model.h5')
 preprocessor = load('preprocessing_pipeline.joblib')
-
-def generate_adversarial_examples(model, x, y_true, epsilon=0.1):
-    x = tf.convert_to_tensor(x)
-    y_true = tf.convert_to_tensor(y_true)
-
-    # Ensure y_true is shaped correctly
-    y_true = tf.reshape(y_true, (x.shape[0], 1))  # Batch dimension should match x
-
-    with tf.GradientTape() as tape:
-        tape.watch(x)
-        predictions = model(x, training=False)
-        loss = tf.keras.losses.binary_crossentropy(y_true, predictions)
-    gradient = tape.gradient(loss, x)
-    adversarial_example = x + epsilon * tf.sign(gradient)
-    return adversarial_example
 
 # Streamlit UI
 st.header('Cybersecurity Threat Prediction')
@@ -90,7 +77,7 @@ if st.button("Predict Threat"):
         # Assuming binary classification with a positive label
         y_true = np.array([1])
 
-        # Generate adversarial example
+        # Generate adversarial example using the imported function
         input_data_processed_adv = generate_adversarial_examples(
             model, input_data_processed, y_true
         )
