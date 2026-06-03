@@ -16,8 +16,6 @@
 
 [![DOI](https://img.shields.io/badge/DOI-10.1007/978--981--96--7134--2_3-blue?style=flat-square&logo=doi)](https://doi.org/10.1007/978-981-96-7134-2_3)
 
-[📄 Read Paper](#) · [🚀 Live Demo](https://av-cybersecurity-demo.streamlit.app) · [📊 Model Card](#-model-performance) · [🐳 Docker](#-docker-deployment)
-
 </div>
 
 ---
