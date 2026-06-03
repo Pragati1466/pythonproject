@@ -16,8 +16,6 @@
 
 [![DOI](https://img.shields.io/badge/DOI-10.1007/978--981--96--7134--2_3-blue?style=flat-square&logo=doi)](https://doi.org/10.1007/978-981-96-7134-2_3)
 
-[📄 Read Paper](https://doi.org/10.1007/978-981-96-7134-2_3) · [🚀 Live Demo](https://av-cybersecurity-demo.streamlit.app) · [📊 Model Card](#-model-performance) · [🐳 Docker](#-docker-deployment)
-
 </div>
 
 ---
@@ -416,27 +414,6 @@ mindmap
 > 🔗 [https://doi.org/10.1007/978-981-96-7134-2_3](https://doi.org/10.1007/978-981-96-7134-2_3)
 > 📅 Published: 01 October 2025
 
-**BibTeX:**
-
-```bibtex
-@inproceedings{chaudhary2025adversarial,
-  author    = {Chaudhary, Pragati and Pragati and Rani, Ritu and
-               Jaiswal, Garima and Sharma, Rajiv and Sharma, Arun},
-  title     = {Enhancing Cybersecurity in Autonomous Vehicles Through Adversarial Robustness},
-  booktitle = {Innovative Computing and Communications. ICICC 2025},
-  editor    = {Hassanien, Aboul Ella and Anand, Siddharth and
-               Jaiswal, Abhishek and Kumar, Praveen},
-  series    = {Lecture Notes in Networks and Systems},
-  volume    = {1436},
-  pages     = {Chapter 3},
-  publisher = {Springer, Singapore},
-  year      = {2025},
-  month     = {October},
-  day       = {01},
-  doi       = {10.1007/978-981-96-7134-2_3},
-  url       = {https://doi.org/10.1007/978-981-96-7134-2_3},
-}
-```
 ---
 
 ## 📄 License
