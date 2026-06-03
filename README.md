@@ -400,6 +400,18 @@ mindmap
       Edge TPU / TensorRT inference
       ONNX export
       ISO 21434 compliance
+---
+
+## 📝 Citation
+
+> Chaudhary, P., Pragati, Rani, R., Jaiswal, G., Sharma, R., Sharma, A. (2025).
+> **Enhancing Cybersecurity in Autonomous Vehicles Through Adversarial Robustness.**
+> In: Hassanien, A.E., Anand, S., Jaiswal, A., Kumar, P. (eds)
+> *Innovative Computing and Communications. ICICC 2025.*
+> Lecture Notes in Networks and Systems, vol 1436. Springer, Singapore.
+> 🔗 [https://doi.org/10.1007/978-981-96-7134-2_3](https://doi.org/10.1007/978-981-96-7134-2_3)
+> 📅 Published: 01 October 2025
+
 ```
 
 ## 📄 License
