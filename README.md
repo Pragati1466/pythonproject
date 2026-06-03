@@ -412,7 +412,7 @@ mindmap
 > 🔗 [https://doi.org/10.1007/978-981-96-7134-2_3](https://doi.org/10.1007/978-981-96-7134-2_3)
 > 📅 Published: 01 October 2025
 
-```
+---
 
 ## 📄 License
 
