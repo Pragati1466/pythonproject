@@ -33,7 +33,6 @@
 - [Docker Deployment](#-docker-deployment)
 - [Streamlit App](#-streamlit-app)
 - [Future Scope](#-future-scope)
-- [Citation](#-citation)
 
 ---
 
