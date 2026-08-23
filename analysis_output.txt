@@ -1,0 +1,64 @@
+======================================================================
+Raw engineered features (before encoding): 12
+Encoded feature space A (after one-hot):    20
+======================================================================
+Best RF hyperparameters (full-data grid search): {'clf__max_depth': None, 'clf__min_samples_leaf': 4, 'clf__n_estimators': 100}
+
+[Random Forest | 5-fold Stratified CV | N=50 samples, 20 features]
+Accuracy : 94.00%
+Precision: 95.83%
+Recall   : 92.00%
+F1-score : 93.88%
+Confusion matrix -> TN=24 FP=1 FN=2 TP=23
+False-Positive Rate: 4.00%
+Threat-Detection Rate (Recall): 92.00%
+
+Feature importance ranking (top 9 of 20, >=90% cumulative importance):
+  1. Network_Traffic_MBs       importance=0.2816
+  2. Firmware_Version_v1.2     importance=0.2284
+  3. Sensor_Data               importance=0.1028
+  4. Vehicle_Speed_kmh         importance=0.0741
+  5. Geofencing_Status_Outside importance=0.0645
+  6. Geofencing_Status_Inside  importance=0.0611
+  7. Firmware_Version_v1.3     importance=0.0542
+  8. Firmware_Version_v1.1     importance=0.0283
+  9. Latitude                  importance=0.0251
+
+Feature space reduced: 20 -> 9 variables (55.0% reduction)
+Accuracy retained after reduction: 94.00% (full-feature accuracy: 94.00%)
+F1 retained after reduction:       93.88% (full-feature F1: 93.88%)
+
+Attack scenarios evaluated: 16 distinct types across 25 adversarial samples
+Per-attack-type detection rate:
+  Buffer Overflow       : 100.0%
+  Command Injection     : 100.0%
+  Credential Stuffing   : 100.0%
+  Cross-Site Scripting  : 100.0%
+  Data Injection        : 100.0%
+  Denial of Service     : 100.0%
+  Malware               : 100.0%
+  Man-in-the-Middle     : 100.0%
+  Phishing              : 50.0%
+  Privilege Escalation  : 100.0%
+  Replay Attack         : 100.0%
+  SQL Injection         : 50.0%
+  Session Hijacking     : 100.0%
+  Social Engineering    : 100.0%
+  URL Spoofing          : 100.0%
+  Zero-Day Exploit      : 100.0%
+Overall threat-detection rate: 92.00%
+Overall false-positive rate:   4.00%
+
+Model comparison (5-fold Stratified CV, same feature set):
+  Logistic Regression    Acc=96.00%  Prec=100.00%  Rec=92.00%  F1=95.83%
+  SVM (RBF kernel)       Acc=94.00%  Prec=95.83%  Rec=92.00%  F1=93.88%
+  Gradient Boosting      Acc=96.00%  Prec=96.00%  Rec=96.00%  F1=96.00%
+  Random Forest          Acc=94.00%  Prec=95.83%  Rec=92.00%  F1=93.88%
+
+RF F1 improvement over strongest baseline: -2.2%
+
+Robustness under adversarial (sign-noise / FGSM-style) perturbation:
+  eps=0.0  Accuracy=98.00%  Precision=100.00%  Recall=96.00%
+  eps=0.1  Accuracy=98.00%  Precision=100.00%  Recall=96.00%
+  eps=0.2  Accuracy=98.00%  Precision=100.00%  Recall=96.00%
+  eps=0.3  Accuracy=98.00%  Precision=100.00%  Recall=96.00%

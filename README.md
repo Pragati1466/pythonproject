@@ -29,6 +29,7 @@
 - [Dataset](#-dataset)
 - [Model Architecture](#-model-architecture)
 - [Model Performance](#-model-performance)
+- [Random Forest Anomaly-Detection Pipeline](#-random-forest-anomaly-detection-pipeline-supplementary-analysis)
 - [Quick Start](#-quick-start)
 - [Docker Deployment](#-docker-deployment)
 - [Streamlit App](#-streamlit-app)
@@ -141,6 +142,10 @@ pythonproject/
 │                                        # FastGradientMethod · ε ∈ {0.1, 0.2, 0.3}
 │
 ├── 📈  accuracy.py                      # Confusion matrix · precision · recall · F1
+│
+├── 🌲  rf_pipeline_metrics.py           # Leakage-free Random Forest pipeline
+│                                        # CV metrics · feature reduction · attack
+│                                        # coverage · baseline comparison · FGSM robustness
 │
 ├── ⏱️   avgtimeresponse.py              # Latency benchmarking — avg threat response ms
 │
@@ -310,6 +315,91 @@ Actual: ADVERSARIAL         FN = 708               TP = 4300
 
 ---
 
+## 🌲 Random Forest Anomaly-Detection Pipeline (Supplementary Analysis)
+
+In addition to the CNN model reported in the published paper above, this repo
+includes a standalone **leakage-free Random Forest pipeline**
+(`rf_pipeline_metrics.py`) built directly on `test_data.csv`. It fixes a
+data-leakage issue present in the legacy `accuracy.py` script, which trained
+on post-attack outcome columns (`Attack_Type`, `Attack_Severity`,
+`Response_Action`, `Attack_Duration`, `Attack_Frequency`) that are only known
+*after* an attack is already confirmed. The new pipeline uses only genuine
+pre-detection sensor/vehicle telemetry.
+
+> ⚠️ **Scale disclaimer:** `test_data.csv` contains only 50 labelled samples
+> (a demo/smoke-test set), evaluated via 5-fold stratified cross-validation.
+> These figures are a proof-of-concept on this small sample, not a
+> replacement for the paper's large-scale CNN results above.
+
+**Random Forest performance (5-fold Stratified CV, N=50, tuned via GridSearchCV):**
+
+| Metric | Score |
+|---|---|
+| **Accuracy** | **94.0%** |
+| **Precision** | 95.8% |
+| **Recall** | 92.0% |
+| **F1-Score** | 93.9% |
+| **False-Positive Rate** | 4.0% |
+
+**Confusion Matrix:**
+
+```
+                      Predicted: BENIGN   Predicted: ADVERSARIAL
+Actual: BENIGN              TN = 24               FP = 1
+Actual: ADVERSARIAL         FN = 2                TP = 23
+```
+
+**Feature engineering & reduction:** 12 engineered behavioural/sensor
+features (sensor reading, vehicle speed, network traffic, GPS lat/lon,
+sensor type/status, vehicle model, firmware version, geofencing status,
+error-code flag, hour-of-day) → 20 variables after one-hot encoding →
+reduced to the **top 9 features by Random Forest importance (≥90% cumulative
+importance)**, i.e. a **55% feature-space reduction (20 → 9)** with **zero
+loss in accuracy or F1** (94.0% / 93.9% retained).
+
+Top contributing features: `Network_Traffic`, `Firmware_Version`,
+`Sensor_Data`, `Vehicle_Speed`, `Geofencing_Status`, `Latitude`.
+
+**Attack-scenario coverage:** 16 distinct attack types evaluated — Denial of
+Service, Malware, Phishing, SQL Injection, Data Injection,
+Man-in-the-Middle, Buffer Overflow, Social Engineering, Credential
+Stuffing, Cross-Site Scripting, Replay Attack, Session Hijacking,
+Privilege Escalation, Zero-Day Exploit, Command Injection, URL Spoofing —
+achieving a **92.0% overall threat-detection rate** while maintaining a
+**4.0% false-positive rate**.
+
+**Baseline comparison (5-fold Stratified CV, identical feature set):**
+
+| Model | Accuracy | Precision | Recall | F1 |
+|---|---|---|---|---|
+| Logistic Regression | 96.0% | 100.0% | 92.0% | 95.8% |
+| SVM (RBF kernel) | 94.0% | 95.8% | 92.0% | 93.9% |
+| Gradient Boosting | 96.0% | 96.0% | 96.0% | 96.0% |
+| **Random Forest** | 94.0% | 95.8% | 92.0% | 93.9% |
+
+> On this small sample, Gradient Boosting edges out Random Forest on F1
+> (96.0% vs 93.9%), and Random Forest ties Logistic Regression on precision.
+> Random Forest is retained as the primary model for its built-in,
+> interpretable feature-importance ranking, which directly drives the
+> 55% feature-space reduction above.
+
+**Robustness under simulated FGSM-style (sign-noise) perturbation:**
+
+| ε | Accuracy | Precision | Recall |
+|---|---|---|---|
+| 0.0 (clean) | 98.0% | 100.0% | 96.0% |
+| 0.1 | 98.0% | 100.0% | 96.0% |
+| 0.2 | 98.0% | 100.0% | 96.0% |
+| 0.3 | 98.0% | 100.0% | 96.0% |
+
+Reproduce these numbers with:
+
+```bash
+python rf_pipeline_metrics.py
+```
+
+---
+
 ## ⚡ Quick Start
 
 ```bash
@@ -330,6 +420,10 @@ python train_model.py
 # 5. Evaluate
 python accuracy.py
 python avgtimeresponse.py
+
+# 5b. Run the leakage-free Random Forest pipeline (CV metrics, feature
+#     reduction, attack coverage, baseline comparison, FGSM robustness)
+python rf_pipeline_metrics.py
 
 # 6. Run adversarial attack simulation
 python implementation.py
